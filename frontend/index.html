@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkAI | Smart Parking</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                <i class="fa-solid fa-square-parking"></i>
+            </div>
+
+            <div>
+                <h2>ParkAI</h2>
+                <span>Smart Parking</span>
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a class="active">
+
+                <i class="fa-solid fa-chart-pie"></i>
+
+                Dashboard
+
+            </a>
+
+
+            <a>
+
+                <i class="fa-solid fa-car"></i>
+
+                Parking Analysis
+
+            </a>
+
+
+            <a>
+
+                <i class="fa-solid fa-brain"></i>
+
+                AI Detection
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="ai-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+
+                    <strong>AI System</strong>
+
+                    <small>Model Online</small>
+
+                </div>
+
+            </div>
+
+            <p>ResNet50 • v1.0</p>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Parking Dashboard</h1>
+
+                <p>AI-powered parking occupancy monitoring</p>
+
+            </div>
+
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                System Online
+
+            </div>
+
+        </header>
+
+
+        <!-- UPLOAD -->
+
+        <section class="upload-card">
+
+            <div class="upload-content">
+
+                <div class="upload-icon">
+
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2>Analyze Parking Area</h2>
+
+                    <p>
+                        Upload a parking area image to detect
+                        available and occupied spaces.
+                    </p>
+
+                    <label for="imageInput" class="choose-btn">
+
+                        <i class="fa-solid fa-image"></i>
+
+                        Choose Parking Image
+
+                    </label>
+
+                    <input
+                        type="file"
+                        id="imageInput"
+                        accept="image/*"
+                        hidden
+                    >
+
+                    <span id="fileName">
+                        No image selected
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="analyzeButton"
+                onclick="analyzeParking()"
+            >
+
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+
+                Analyze Parking
+
+            </button>
+
+        </section>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="loading"
+            class="loading hidden"
+        >
+
+            <div class="spinner"></div>
+
+            <span>
+                AI is analyzing parking slots...
+            </span>
+
+        </div>
+
+
+        <!-- STATISTICS -->
+
+        <section
+            id="dashboard"
+            class="stats-grid hidden"
+        >
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+
+                    <i class="fa-solid fa-square-parking"></i>
+
+                </div>
+
+                <div>
+
+                    <span>Total Slots</span>
+
+                    <h2 id="totalSlots">0</h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                </div>
+
+                <div>
+
+                    <span>Available</span>
+
+                    <h2 id="emptySlots">0</h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon red">
+
+                    <i class="fa-solid fa-car"></i>
+
+                </div>
+
+                <div>
+
+                    <span>Occupied</span>
+
+                    <h2 id="occupiedSlots">0</h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+
+                    <i class="fa-solid fa-chart-line"></i>
+
+                </div>
+
+                <div>
+
+                    <span>Occupancy Rate</span>
+
+                    <h2 id="occupancyRate">0%</h2>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- CONTENT GRID -->
+
+        <section
+            id="results"
+            class="results-grid hidden"
+        >
+
+
+            <!-- IMAGE -->
+
+            <div class="panel image-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>Parking Area</h2>
+
+                        <p>Live AI detection result</p>
+
+                    </div>
+
+
+                    <div class="legend">
+
+                        <span>
+
+                            <i class="green-dot"></i>
+
+                            Available
+
+                        </span>
+
+                        <span>
+
+                            <i class="red-dot"></i>
+
+                            Occupied
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="image-container">
+
+                    <img
+                        id="resultImage"
+                        alt="Parking analysis"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- OCCUPANCY -->
+
+            <div class="panel occupancy-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>Occupancy Overview</h2>
+
+                        <p>Current parking utilization</p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="circle-wrapper">
+
+                    <div class="occupancy-circle">
+
+                        <span id="circlePercentage">
+                            0%
+                        </span>
+
+                        <small>Occupied</small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="occupancy-bars">
+
+                    <div class="bar-label">
+
+                        <span>
+                            Available
+                        </span>
+
+                        <strong id="availablePercent">
+                            0%
+                        </strong>
+
+                    </div>
+
+                    <div class="bar">
+
+                        <div
+                            id="availableBar"
+                            class="available-bar"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="bar-label">
+
+                        <span>
+                            Occupied
+                        </span>
+
+                        <strong id="occupiedPercent">
+                            0%
+                        </strong>
+
+                    </div>
+
+                    <div class="bar">
+
+                        <div
+                            id="occupiedBar"
+                            class="occupied-bar"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- SLOTS -->
+
+        <section
+            id="slotSection"
+            class="panel slots-panel hidden"
+        >
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>Parking Slot Status</h2>
+
+                    <p>Individual slot predictions</p>
+
+                </div>
+
+            </div>
+
+
+            <div id="slotResults" class="slot-grid"></div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
